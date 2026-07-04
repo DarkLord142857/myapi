@@ -31,9 +31,10 @@ if ($isAdmin === 0 && $landlord_id <= 0) {
 }
 
 try {
-    // Truy vấn tất cả hóa đơn thuộc các tòa nhà do chủ trọ quản lý (MaQL = landlord_id)
+    // 🛠️ ĐÃ CẬP NHẬT: Thêm Subquery lấy DonGia từ ChiTietHoaDon với điều kiện DichVuId IS NULL để lấy đúng tiền phòng gốc
     $query = "SELECT hd.Id AS HoaDonId, hd.KyHoaDon, hd.TongTienHoaDon, hd.CongNo, hd.TrangThaiThanhToan, hd.CreatedDate,
-                     pt.SoPhong, nt.TenNha, u.FullName AS TenKhachHang
+                     pt.SoPhong, nt.TenNha, u.FullName AS TenKhachHang,
+                     (SELECT ct.DonGia FROM ChiTietHoaDon ct WHERE ct.HoaDonId = hd.Id AND ct.DichVuId IS NULL LIMIT 1) AS TienPhongGoc
               FROM HoaDon hd
               INNER JOIN PhongTro pt ON hd.PhongTroId = pt.Id
               INNER JOIN NhaTro nt ON pt.NhaTroId = nt.Id
@@ -67,7 +68,9 @@ try {
             "CreatedDate" => $row['CreatedDate'],
             "RoomNumber" => $row['SoPhong'],
             "HouseName" => $row['TenNha'],
-            "CustomerName" => $row['TenKhachHang'] ?? "Phòng trống/Chưa gán khách"
+            "CustomerName" => $row['TenKhachHang'] ?? "Phòng trống/Chưa gán khách",
+            // 🛠️ ĐÃ CẬP NHẬT: Trả thêm trường RoomPrice về cho ứng dụng Flutter nhận diện
+            "RoomPrice" => $row['TienPhongGoc'] !== null ? (float)$row['TienPhongGoc'] : 3500000 
         ];
     }
 
