@@ -1,0 +1,108 @@
+--- 2026-07-02 19:25:15 ---
+GET: {"id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:25:16 ---
+GET: {"landlord_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:29:13 ---
+GET: {"user_id":"1","MaQL":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","Content-Type":"application\/json","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:32:10 ---
+GET: []
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Content-Length":"147","Accept-Encoding":"gzip","X-User-Id":"1","Content-Type":"application\/json","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:32:11 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:20 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:23 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:26 ---
+GET: []
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Content-Length":"8","Accept-Encoding":"gzip","X-User-Id":"1","Content-Type":"application\/json","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:27 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:29 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:34 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:36:36 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:38:17 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:38:20 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:38:25 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:38:51 ---
+GET: {"landlord_id":"2"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:38:52 ---
+GET: {"id":"2"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:46:48 ---
+GET: {"id":"2"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:52:04 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:52:07 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:52:09 ---
+GET: []
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Content-Length":"8","Accept-Encoding":"gzip","X-User-Id":"1","Content-Type":"application\/json","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:52:10 ---
+GET: {"user_id":"1","include_deleted":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:52:11 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:52:28 ---
+GET: {"id":"2"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:57:27 ---
+GET: {"id":"2"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
+--- 2026-07-02 19:58:07 ---
+GET: {"user_id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","X-User-Id":"1","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: 1
+--- 2026-07-02 19:58:09 ---
+GET: {"id":"1"}
+HEADERS: {"Connection":"close","Host":"10.0.2.2","Accept-Encoding":"gzip","User-Agent":"Dart\/3.12 (dart:io)"}
+SERVER_HTTP_X_USER_ID: not set
