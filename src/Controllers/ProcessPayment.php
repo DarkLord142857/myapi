@@ -26,40 +26,28 @@ $hoaDonId = intval($data['hoadon_id']);
 $soTienThanhToan = floatval($data['so_tien_thanh_toan']);
 $phuongThuc = $data['phuong_thuc']; 
 $maGiaoDich = $data['ma_giao_dich'];
-$nguoiNhanId = intval($data['nguoi_nhan_id']); 
-$ghiChu = isset($data['ghiChu']) ? $data['ghiChu'] : '';
+$nguoiNhanId = intval($data['nguoi_nhan_id']);
+$ghiChu = isset($data['ghi_chu']) ? $data['ghi_chu'] : '';
 
 try {
-    // Bắt đầu Transaction để bảo toàn dữ liệu
+    // Khởi động một chuỗi Transaction để đảm bảo tính an toàn dữ liệu nguyên khối
     $db->beginTransaction();
 
-    // 1. Kiểm tra hóa đơn và lấy cột `CongNo`, `TrangThai` thực tế từ DB
-    $queryHD = "SELECT TongTienHoaDon, CongNo, TrangThaiThanhToan FROM hoadon WHERE Id = :hoadon_id FOR UPDATE";
+    // 1. Kiểm tra sự tồn tại của hóa đơn và khóa dòng dữ liệu đó lại tránh xung đột đồng thời (Race Condition)
+    $queryHD = "SELECT Id, CongNo FROM hoadon WHERE Id = :id FOR UPDATE";
     $stmtHD = $db->prepare($queryHD);
-    $stmtHD->bindParam(":hoadon_id", $hoaDonId);
+    $stmtHD->bindParam(":id", $hoaDonId);
     $stmtHD->execute();
-    $hoaDon = $stmtHD->fetch(PDO::FETCH_ASSOC);
+    $invoice = $stmtHD->fetch(PDO::FETCH_ASSOC);
 
-    if (!$hoaDon) {
-        $db->rollBack();
-        echo json_encode(["status" => "error", "message" => "Hóa đơn không tồn tại."]);
-        exit();
+    if (!$invoice) {
+        throw new Exception("Hóa đơn mục tiêu không tồn tại trên hệ thống.");
     }
 
-    // 2. Tính toán số tiền Còn Nợ mới
-    $conNoHienTai = floatval($hoaDon['CongNo']);
-    $conNoMoi = $conNoHienTai - $soTienThanhToan;
-
-    // Xác định trạng thái dựa theo ENUM ('ChuaThanhToan', 'DaThanhToan') trong SQL
-    $trangThaiMoi = 'ChuaThanhToan';
-    if ($conNoMoi <= 0) {
-        $conNoMoi = 0; // Tránh tiền nợ bị âm
-        $trangThaiMoi = 'DaThanhToan';
-    }
-
-    // 3. Thêm lịch sử giao dịch vào bảng `thanhtoan`
-    $queryInsertTT = "INSERT INTO thanhtoan (Id, HoaDonId, NgayThanhToan, SoTienThanhToan, PhuongThucThanhToan, MaGiaoDich, NguoiNhanId, GhiChu, IsDeleted) 
-                      VALUES (NULL, :hoadon_id, NOW(), :so_tien, :phuong_thuc, :ma_gd, :nguoi_nhan, :ghi_chu, 0)";
+    // 2. Tiến hành thêm bản ghi mới vào lịch sử thanh toán của bảng `thanhtoan` (Dùng bảng gốc của bạn)
+    $queryInsertTT = "INSERT INTO thanhtoan (HoaDonId, SoTienThanhToan, PhuongThucThanhToan, MaGiaoDich, NguoiNhanId, GhiChu, NgayThanhToan) 
+                      VALUES (:hoadon_id, :so_tien, :phuong_thuc, :ma_gd, :nguoi_nhan, :ghi_chu, NOW())";
+    
     $stmtInsertTT = $db->prepare($queryInsertTT);
     $stmtInsertTT->bindParam(":hoadon_id", $hoaDonId);
     $stmtInsertTT->bindParam(":so_tien", $soTienThanhToan);
@@ -69,13 +57,13 @@ try {
     $stmtInsertTT->bindParam(":ghi_chu", $ghiChu);
     $stmtInsertTT->execute();
 
-    // 4. Cập nhật lại cột `CongNo` và `TrangThaiThanhToan` trong bảng `hoadon`
+    // 3. 🛠️ CẬP NHẬT TRẠNG THÁI TRUNG GIAN: Chuyển sang 'ChoDuyet', giữ nguyên công nợ cho đến khi chủ nhà duyệt
+    $trangThaiChoDuyet = 'ChoDuyet'; 
     $queryUpdateHD = "UPDATE hoadon 
-                      SET CongNo = :con_no_moi, TrangThaiThanhToan = :trang_thai_moi 
+                      SET TrangThaiThanhToan = :trang_thai_moi 
                       WHERE Id = :hoadon_id";
     $stmtUpdateHD = $db->prepare($queryUpdateHD);
-    $stmtUpdateHD->bindParam(":con_no_moi", $conNoMoi);
-    $stmtUpdateHD->bindParam(":trang_thai_moi", $trangThaiMoi);
+    $stmtUpdateHD->bindParam(":trang_thai_moi", $trangThaiChoDuyet);
     $stmtUpdateHD->bindParam(":hoadon_id", $hoaDonId);
     $stmtUpdateHD->execute();
 
@@ -84,20 +72,15 @@ try {
 
     echo json_encode([
         "status" => "success",
-        "message" => "Thanh toán hóa đơn thành công.",
-        "data" => [
-            "hoadon_id" => $hoaDonId,
-            "so_tien_da_dong" => $soTienThanhToan,
-            "con_no_lai" => $conNoMoi,
-            "trang_thai_moi" => $trangThaiMoi
-        ]
-    ]);
+        "message" => "Yêu cầu thanh toán của bạn đã được gửi thành công! Vui lòng chờ chủ trọ duyệt."
+    ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
+    // Trả dữ liệu về trạng thái ban đầu nếu có bất kỳ lỗi nào phát sinh
     $db->rollBack();
     echo json_encode([
         "status" => "error",
-        "message" => "Lỗi xử lý thanh toán: " . $e->getMessage()
-    ]);
+        "message" => "Giao dịch thất bại: " . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>
