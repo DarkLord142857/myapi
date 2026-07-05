@@ -7,65 +7,60 @@ include_once '../../config/database.php';
 $database = new Database();
 $db = $database->getConnection();
 
-$landlord_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
+// 1. Lấy chính xác user_id của khách thuê từ URL
+$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 
-if ($landlord_id <= 0) {
-    echo json_encode(["status" => "error", "message" => "Thiếu mã chủ trọ."], JSON_UNESCAPED_UNICODE);
+if ($user_id <= 0) {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "Thiếu mã khách thuê phòng (user_id)."], JSON_UNESCAPED_UNICODE);
     exit();
 }
 
 try {
-    // 1. Tìm NhaTroId mà người thuê này đang ở dựa trên hợp đồng thuê còn hiệu lực (IsActive = 1)
-    $queryHouse = "SELECT pt.NhaTroId 
-                   FROM hopdongthue hdt
-                   INNER JOIN phongtro pt ON hdt.PhongTroId = pt.Id
-                   WHERE hdt.KhachHangId = :userId AND hdt.IsActive = 1 AND hdt.IsDeleted = 0 
-                   LIMIT 1";
-    $stmtHouse = $db->prepare($queryHouse);
-    $stmtHouse->execute([':userId' => $user_id]);
-    $houseRow = $stmtHouse->fetch(PDO::FETCH_ASSOC);
-    
-    // Nếu khách chưa có hợp đồng thì mặc định mã nhà bằng 0 để tránh lỗi SQL
-    $myNhaTroId = $houseRow ? intval($houseRow['NhaTroId']) : 0;
-
-    // 2. Lấy danh sách thông báo: Khớp mã nhà trọ họ đang ở HOẶC đích danh ID của họ trong ThongBao_User
-    $query = "SELECT DISTINCT tb.Id, tb.TieuDe, tb.NoiDung, tb.CreatedDate, u.FullName as TenChuTro,
-                     IF(tbu.TrangThai IS NULL, 0, tbu.TrangThai) as PersonalTrangThai
-              FROM ThongBao tb
-              LEFT JOIN Users u ON tb.NguoiGuiId = u.id
-              LEFT JOIN ThongBao_User tbu ON tb.Id = tbu.ThongBaoId
-              WHERE 
-                -- Trường hợp 1: Thông báo dịch vụ lẻ gửi đích danh cho tài khoản này
-                (tbu.UserId = :userId)
-                
-                -- Trường hợp 2: Thông báo chung của tòa nhà trọ mà khách này đang ở (và không gửi riêng ai)
-                OR (tb.NhaTroId = :nhaTroId AND tbu.UserId IS NULL)
-              ORDER BY tb.CreatedDate DESC";
+    // 2. Truy vấn lấy danh sách hóa đơn dựa trên bảng hợp đồng thuê của khách hàng
+    // Giữ nguyên KyHoaDon và dùng STR_TO_DATE để sắp xếp theo thời gian giảm dần
+    $query = "SELECT 
+                hd.Id, 
+                hd.TongTienHoaDon, 
+                hd.CongNo, 
+                hd.TrangThaiThanhToan,
+                hd.KyHoaDon,
+                pt.NhaTroId,
+                nt.MaQL AS NguoiNhanId
+              FROM hoadon hd
+              INNER JOIN phongtro pt ON hd.PhongTroId = pt.Id
+              INNER JOIN nhatro nt ON pt.NhaTroId = nt.Id
+              INNER JOIN hopdongthue hdt ON pt.Id = hdt.PhongTroId
+              WHERE hdt.KhachHangId = :userId 
+                AND hdt.IsActive = 1 
+                AND hdt.IsDeleted = 0
+              ORDER BY STR_TO_DATE(CONCAT('01/', hd.KyHoaDon), '%d/%m/%Y') DESC";
 
     $stmt = $db->prepare($query);
-    $stmt->execute([
-        ':userId' => $user_id,
-        ':nhaTroId' => $myNhaTroId
-    ]);
+    $stmt->execute([':userId' => $user_id]);
     
-    $notifications = [];
+    $invoices = [];
     while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $notifications[] = [
-            "id" => (int)$row['Id'],
-            "tieuDe" => $row['TieuDe'],
-            "noiDung" => $row['NoiDung'],
-            "tenChuTro" => $row['TenChuTro'] ?? "Chủ nhà trọ",
-            "trangThai" => (int)$row['PersonalTrangThai'], 
-            "createdDate" => $row['CreatedDate']
+        $invoices[] = [
+            "Id" => (int)$row['Id'],
+            "TongTienHoaDon" => (double)$row['TongTienHoaDon'],
+            "CongNo" => (double)$row['CongNo'],
+            "TrangThaiThanhToan" => $row['TrangThaiThanhToan'],
+            "KyHoaDon" => $row['KyHoaDon'],
+            "NguoiNhanId" => (int)$row['NguoiNhanId']
         ];
     }
 
-    echo json_encode(["status" => "success", "data" => $notifications], JSON_UNESCAPED_UNICODE);
+    http_response_code(200);
+    echo json_encode([
+        "status" => "success", 
+        "data" => $invoices
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "Lỗi hệ thống: " . $e->getMessage()], JSON_UNESCAPED_UNICODE);
-} catch (Exception $e) {
-    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+    echo json_encode([
+        "status" => "error", 
+        "message" => "Lỗi hệ thống: " . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
 }
-?>
