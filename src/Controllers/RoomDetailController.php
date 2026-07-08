@@ -30,11 +30,11 @@ try {
                   FROM PhongTro pt
                   INNER JOIN NhaTro nt ON pt.NhaTroId = nt.id
                   WHERE pt.Id = :room_id AND pt.IsDeleted = 0";
-                  
+
     $stmtRoom = $db->prepare($queryRoom);
     $stmtRoom->bindParam(":room_id", $roomId);
     $stmtRoom->execute();
-    
+
     $roomInfo = $stmtRoom->fetch(PDO::FETCH_ASSOC);
 
     if (!$roomInfo) {
@@ -48,7 +48,7 @@ try {
     $stmtImg = $db->prepare($queryImages);
     $stmtImg->bindParam(":room_id", $roomId);
     $stmtImg->execute();
-    
+
     $images = array();
     while ($rowImg = $stmtImg->fetch(PDO::FETCH_ASSOC)) {
         if (!empty($rowImg['HinhAnhUrl'])) {
@@ -57,15 +57,15 @@ try {
     }
 
     // 3. LẤY DANH SÁCH THUỘC TÍNH ĐI KÈM PHÒNG TRÒ
-    $queryAttributes = "SELECT tt.TenThuocTinh, pttt.GiaTriThucTe, tt.DonVi 
+    $queryAttributes = "SELECT tt.TenThuocTinh, pttt.GiaTriThucTe, tt.DonVi
                         FROM phongtro_thuoctinh pttt
                         INNER JOIN thuoctinhphong tt ON pttt.ThuocTinhPhongId = tt.Id
                         WHERE pttt.PhongTroId = :room_id";
-                
+
     $stmtAttr = $db->prepare($queryAttributes);
     $stmtAttr->bindParam(":room_id", $roomId);
     $stmtAttr->execute();
-    
+
     $attributes = array();
     while ($rowAttr = $stmtAttr->fetch(PDO::FETCH_ASSOC)) {
         $attributes[] = array(
@@ -85,7 +85,8 @@ try {
         "HouseName" => $roomInfo['TenNha'],
         "Address" => $roomInfo['DiaChi'],
         "LegalDocuments" => $roomInfo['GiayToPhapLy'] ?? "Đang cập nhật",
-        "Images" => $images,
+        "HinhAnhDaiDien" => !empty($images) ? $images[0] : null,
+        "DanhSachHinhAnh" => $images,
         "Attributes" => $attributes
     );
 

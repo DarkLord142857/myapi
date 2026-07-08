@@ -4,7 +4,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once '../../config/database.php';
+include_once __DIR__ . '/../../config/database.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -17,18 +17,18 @@ if (!$db) {
 
 try {
     // 🟢 ĐÃ SỬA: Lấy trực tiếp pthi.HinhAnhUrl (Không cần CAST hay giải mã HEX như cũ nữa)
-    $query = "SELECT 
-                p.Id AS PhongId, 
+    $query = "SELECT
+                p.Id AS PhongId,
                 p.NhaTroId,
-                p.SoPhong, 
+                p.SoPhong,
                 p.SoNguoiToiDa,
                 p.SoLuongXeToiDa,
-                p.GiaPhong, 
+                p.GiaPhong,
                 p.TrangThai,
-                pt.GiaTriThucTe, 
+                pt.GiaTriThucTe,
                 ttp.Id AS ThuocTinhId,
-                ttp.TenThuocTinh, 
-                ttp.DonVi, 
+                ttp.TenThuocTinh,
+                ttp.DonVi,
                 ttp.KieuDuLieu,
                 pthi.Id AS HinhAnhId,
                 pthi.HinhAnhUrl
@@ -56,6 +56,7 @@ try {
                 "SoLuongXeToiDa" => (int)$row['SoLuongXeToiDa'],
                 "GiaPhong" => (double)$row['GiaPhong'],
                 "TrangThai" => (int)$row['TrangThai'],
+                "HinhAnhDaiDien" => null,
                 "DanhSachHinhAnh" => [],
                 "DanhSachThuocTinh" => []
             ];
@@ -92,6 +93,8 @@ try {
     // Định dạng lại danh sách hình ảnh thành mảng tuần tự số nguyên index sạch
     foreach ($rooms as $id => $room) {
         $rooms[$id]['DanhSachHinhAnh'] = array_values($room['DanhSachHinhAnh']);
+        // Lấy ảnh đầu tiên làm ảnh đại diện
+        $rooms[$id]['HinhAnhDaiDien'] = !empty($rooms[$id]['DanhSachHinhAnh']) ? $rooms[$id]['DanhSachHinhAnh'][0] : null;
     }
 
     $resultData = array_values($rooms);
